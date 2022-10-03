@@ -4,6 +4,18 @@ import time
 import random
 pygame.font.init()
 
+
+#2 part boss level
+#part 1 is collecting coins to break bowser's shiels
+#part 2 is surviving unntil shooter is recharged
+#after boss level you unlock penetrating bullets
+
+#change lasers
+#fix movement limit for player and bowser
+#add pop ups between changes
+#
+
+
 WIDTH, HEIGHT = 750, 800
 WIN = pygame.display.set_mode((WIDTH,HEIGHT)) #adjust size of window
 pygame.display.set_caption("Space Shooter")
@@ -11,9 +23,9 @@ pygame.display.set_caption("Space Shooter")
 
 #import imgaes
 
-RED_SPACE_SHIP = pygame.image.load(os.path.join("assets", "pixel_ship_red_small.png"))
-GREEN_SPACE_SHIP = pygame.image.load(os.path.join("assets", "pixel_ship_green_small.png"))
-BLUE_SPACE_SHIP = pygame.image.load(os.path.join("assets", "pixel_ship_blue_small.png"))
+RED_SPACE_SHIP = pygame.image.load(os.path.join("assets", "boo.png"))
+GREEN_SPACE_SHIP = pygame.image.load(os.path.join("assets", "lakitu.png"))
+BLUE_SPACE_SHIP = pygame.image.load(os.path.join("assets", "goomba.png"))
 
 #PLAYER SPACE SHIP             
 MARIO = pygame.image.load(os.path.join("assets", "mario.png"))
@@ -21,6 +33,8 @@ PEACH = pygame.image.load(os.path.join("assets", "peach.png"))
 HELP = pygame.image.load(os.path.join("assets", "help.png"))
 BOWSER = pygame.image.load(os.path.join("assets", "bowser.png"))
 SUPER_BOWSER = pygame.image.load(os.path.join("assets", "super_bowser.png"))
+COIN = pygame.image.load(os.path.join("assets", "coin.png"))
+FIRE = pygame.image.load(os.path.join("assets", "fire.png"))
 
 
 
@@ -29,7 +43,7 @@ RED_LASER = pygame.image.load(os.path.join("assets", "pixel_laser_red.png"))
 GREEN_LASER = pygame.image.load(os.path.join("assets", "pixel_laser_green.png"))
 BLUE_LASER = pygame.image.load(os.path.join("assets", "pixel_laser_blue.png"))
 YELLOW_LASER = pygame.image.load(os.path.join("assets", "pixel_laser_yellow.png")) 
-
+SHELL = pygame.image.load(os.path.join("assets", "shell.png")) 
 
 #BG
 
@@ -103,11 +117,11 @@ class Player(Ship): #inheriting form ship
     def __init__(self, x, y, health=100):
         super().__init__(x, y, health)
         self.ship_img = MARIO
-        self.laser_img = YELLOW_LASER
+        self.laser_img = SHELL
         self.mask = pygame.mask.from_surface(self.ship_img)
         self.max_health = health
 
-    def move_lasers(self, vel, objs):
+    def move_lasers(self, vel, objs, level):
         self.cooldown()
         for laser in self.lasers:
             laser.move(vel)
@@ -115,30 +129,20 @@ class Player(Ship): #inheriting form ship
                 self.lasers.remove(laser)
             else:
                 for obj in objs:
-                    if laser.collision(obj):
-                        objs.remove(obj)
-                        #self.lasers.remove(laser)
-    def move_lasersb(self, vel, objs, counter):
-        self.cooldown()
-        for laser in self.lasers:
-            laser.move(vel)
-            if laser.off_screen(HEIGHT):
-                self.lasers.remove(laser)
-            else:
-                for obj in objs:
-                    if laser.collision(obj):
-                        if counter == 2:
+                    if(level != 2):
+                        if laser.collision(obj):
                             objs.remove(obj)
-                            print("removin")
-
+                            if(level < 4):
+                                self.lasers.remove(laser)
+                                
                         
 class Enemy(Ship):
     COLOR_MAP = {
         "red": (RED_SPACE_SHIP, RED_LASER),
         "blue": (BLUE_SPACE_SHIP, BLUE_LASER),
         "green": (GREEN_SPACE_SHIP, GREEN_LASER),
-        "bowser": (BOWSER, GREEN_LASER),
-        "super bowser": (SUPER_BOWSER, GREEN_LASER)
+        "bowser": (BOWSER, FIRE),
+        "super bowser": (SUPER_BOWSER, FIRE)
         }
     def shoot(self):
          if self.cool_down_counter == 0:
@@ -149,7 +153,7 @@ class Enemy(Ship):
     def shootb(self):
         if self.cool_down_counter == 0:
             for x in range(10):
-                laser = Laser(self.x-((x * 20)-80), self.y, self.laser_img)#overrides to make enemy laser come out of middle
+                laser = Laser(self.x-((x * 20)-200), self.y+150, self.laser_img)#overrides to make enemy laser come out of middle
                 self.lasers.append(laser)
                 self.cool_down_counter = 1
     
@@ -211,12 +215,16 @@ def main():
     end = False
     jesus = False
     rightb = True
+    count_down = 15
+    shooter = True
+    counting = True
 
     def redraw_window(): #draws everything for our window
         pygame.display.update() #everytime we loop, we redraw everything on the screen so that it is updated (60 times a second)
         WIN.blit(BG,(0,0))#blit takes the image and draws it in the window at given coordinates -> (0,0) is top right of the screen
         lives_label = main_font.render(f"Lives: {lives}", 1, (255,255,255)) # red,  green,  blue
         level_label = main_font.render(f"Level:{level}", 1, (255,255,255))
+        
       
         WIN.blit(lives_label,(10,10))
         WIN.blit(PEACH,(WIDTH/2,HEIGHT-100))
@@ -235,6 +243,7 @@ def main():
         if lost:
             lost_label = lost_font.render("GAME OVER!", 1, (255,255,255))
             WIN.blit(lost_label, (WIDTH/2 - lost_label.get_width()/2, 350))
+            cd = 0
 
 
         pygame.display.update()
@@ -242,6 +251,25 @@ def main():
 
       
     while run:
+
+        if counting == True:
+            print("true")
+
+        if(level == 4 and counting == True):
+             shooter = False
+             Timer = main_font.render(f"Time:{int(count_down)}", 1, (128,0,0))#dark red
+             WIN.blit(Timer,(10,100))
+             count_down -= 2/60
+             
+        if(int(count_down)==0):
+             count_down = int(1)
+             print("done")
+             counting = False
+             shooter = True
+             
+        if (level == 4 and counting == False):
+             Shoot = main_font.render(f"SHOOT!!!", 1, (0,255,0))#green
+             WIN.blit(Shoot,(10,100))
         
         clock.tick(FPS)
         redraw_window()
@@ -264,12 +292,12 @@ def main():
                 wave_length = wave_length + 3 #add more enemies for each wave
                 if level == 2 and counter != 2:
                     for i in range(wave_length):
-                        enemy = Enemy(200, 30,"super bowser")
+                        enemy = Enemy(200, 0,"super bowser")
                         enemies.append(enemy)
                         jesus = True
                 elif level == 4:
                     for i in range(wave_length):
-                        enemy = Enemy(200, 30,"bowser")
+                        enemy = Enemy(200, 70,"bowser")
                         enemies.append(enemy)
                 else:
                     for i in range(wave_length):#spawning at random loc off  screen
@@ -284,28 +312,46 @@ def main():
         keys = pygame.key.get_pressed() #check 60 times every second if we are pressing a key
 
 
-        if keys[pygame.K_q]: #left
-            run = False
-            pygame.quit()
-        if keys[pygame.K_a] and player.x - player_vel > 0: #left
-            player.x -= player_vel
-        if keys[pygame.K_d] and player.x + player_vel + player.get_width() < WIDTH: #right
-            player.x += player_vel
-        if keys[pygame.K_w] and player.y - player_vel > 0 :  #up
-            player.y -= player_vel
-        if keys[pygame.K_s] and player.y + player_vel + player.get_height() < HEIGHT: #down
-            player.y += player_vel 
-        if keys[pygame.K_SPACE]: #space
-            player.shoot()
-
-
+        if level != 2 and shooter == True:
+            if keys[pygame.K_q]: #left
+                run = False
+                pygame.quit()
+            if keys[pygame.K_a] and player.x - player_vel > 0: #left
+                player.x -= player_vel
+            if keys[pygame.K_d] and player.x + player_vel + player.get_width() < WIDTH: #right
+                player.x += player_vel
+            if keys[pygame.K_w] and player.y - player_vel > 0:  #up
+                player.y -= player_vel
+            if keys[pygame.K_s] and player.y + player_vel + player.get_height() < HEIGHT: #down
+                player.y += player_vel 
+            if keys[pygame.K_SPACE]: #space
+                player.shoot()
+        else:
+            if keys[pygame.K_q]: #left
+                run = False
+                pygame.quit()
+            if keys[pygame.K_a] and player.x - player_vel > 0: #left
+                player.x -= player_vel
+            if keys[pygame.K_d] and player.x + player_vel + player.get_width() < WIDTH: #right
+                player.x += player_vel
+            if keys[pygame.K_w] and player.y - player_vel > 0 :  #up
+                player.y -= player_vel
+            if keys[pygame.K_s] and player.y + player_vel + player.get_height() < HEIGHT: #down
+                player.y += player_vel 
+            
 
         for enemy in enemies[:]:
             if level == 2:
                 if collect == 0:
-                    WIN.blit(HELP,(100,160)) #draw collectibles
+                    WIN.blit(COIN,(100,160)) #draw collectibles
                 if collect == 1:
-                    WIN.blit(HELP,(100,250)) #draw collectibles
+                    WIN.blit(COIN,(100,250)) #draw collectibles
+                if collect == 2:
+                    WIN.blit(COIN,(300,80)) #draw collectibles
+                if collect == 3:
+                    WIN.blit(COIN,(500,100)) #draw collectibles
+                if collect == 4:
+                    WIN.blit(COIN,(275, HEIGHT - 100)) #draw collectibles
                 if enemy.x == 700:
                     right = False
                     
@@ -363,19 +409,30 @@ def main():
                     enemies.remove(enemy)
 
         if counter == 0:           
-            if (player.x >= 90 and player.x <= 110) and  (player.y >= 150 and player.y <= 170):
+            if (player.x >= 80 and player.x <= 120) and  (player.y >= 140 and player.y <= 180):
                 counter += 1
                 collect += 1
                 
         if counter == 1:
-            if (player.x >= 90 and player.x <= 110) and  (player.y >= 240 and player.y <= 260):
+            if (player.x >= 80 and player.x <= 120) and  (player.y >= 230 and player.y <= 270):
                 counter += 1
                 collect += 1
-                
+        if counter == 2:
+            if (player.x >= 280 and player.x <= 320) and  (player.y >= 60 and player.y <= 100):
+                counter += 1
+                collect += 1
+        if counter == 3:
+            if (player.x >= 480 and player.x <= 520) and  (player.y >= 80 and player.y <= 120):
+                counter += 1
+                collect += 1
+        if counter == 4:
+            if (player.x >= 255 and player.x <= 295) and  (player.y >= 680 and player.y <= 720):
+                counter += 1
+                collect += 1
         
-        player.move_lasers(-laser_vel, enemies)
+        player.move_lasers(-laser_vel, enemies, level)
 
-        if level == 2 and counter == 2 and jesus == True:
+        if level == 2 and counter == 5 and jesus == True:
             jesus = False
             enemies = []
             level += 1
@@ -387,11 +444,6 @@ def main():
             
 
        
-   
-                
-                    
-                    
-            
 
             
 main()
