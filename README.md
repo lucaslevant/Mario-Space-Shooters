@@ -24,6 +24,8 @@ Menu screens - several pop up screens throughout the game to facilitate player u
 Auto Healing - starting at round 5, player gets full health and + 1 life every 3 rounds.
 Music and Sounds - theme song playing in background and changing depending on level - sound effects for shooting and collisions.
 
+*Listen for power up sound byte -- signifies player being healed*
+
 
 SPECIAL LEVELS:
 Level 10 is a two part boss Level. In part 1 your shooter is disabled and you have to dodge bowser's fire until you collect 10 coins.
