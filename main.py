@@ -417,10 +417,10 @@ def main():
         if(level != 12):
             enemy_font = pygame.font.SysFont("comicsans", 30)
             enemy_counter = enemy_font.render(f"Enemies:{len(enemies)}", 1, (255,255,255))
-            WIN.blit(enemy_counter,(WIDTH - level_label.get_width() - 30,50))
+            WIN.blit(enemy_counter,(WIDTH - enemy_counter.get_width(),50))
         if level == 12:
             enemy_counter = main_font.render(f"Enemies:{1}", 1, (255,255,255))
-            WIN.blit(enemy_counter,(WIDTH - level_label.get_width() - 60,50))
+            WIN.blit(enemy_counter,(WIDTH - enemy_counter.get_width(),50))
         if usedp == False and level> 12 and lost == False:
             UN = main_font.render(f"YOU UNLOCKED BLASTER", 1, (0,255,0))#ready to shoot super
             USE = main_font.render(f"PRESS P FOR BLASTER", 1, (0,255,0))#ready to shoot super
