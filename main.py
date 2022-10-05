@@ -343,7 +343,7 @@ def main():
    
     run = True;
     clock = pygame.time.Clock()
-    level = 25
+    level = 0
     lives = 5
     lost_font = pygame.font.SysFont("comicsans",70)
     enemies = []
