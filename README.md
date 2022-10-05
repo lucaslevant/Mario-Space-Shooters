@@ -3,6 +3,7 @@
 LINK TO FULL PLAY THROUGH: https://www.youtube.com/watch?v=ozQehCrs97k&ab_channel=Runner
 
 HOW TO PLAY:
+*Must be run in pygame*
 Press W to move player up.
 Press A to move player left.
 Press S to move player down.
