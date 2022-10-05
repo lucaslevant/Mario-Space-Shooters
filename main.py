@@ -12,31 +12,32 @@ pygame.display.set_caption("Space Shooter")
 
 
 #import imgaes
+
 RED_SPACE_SHIP = pygame.image.load(os.path.join("assets", "boo.png"))
 GREEN_SPACE_SHIP = pygame.image.load(os.path.join("assets", "lakitu.png"))
 BLUE_SPACE_SHIP = pygame.image.load(os.path.join("assets", "goomba.png"))
 
-#Objects             
+#PLAYER SPACE SHIP             
 MARIO = pygame.image.load(os.path.join("assets", "mario.png"))
 PEACH = pygame.image.load(os.path.join("assets", "peach.png"))
 HELP = pygame.image.load(os.path.join("assets", "help.png"))
 BOWSER = pygame.image.load(os.path.join("assets", "dry_bowser.png"))
 SUPER_BOWSER = pygame.image.load(os.path.join("assets", "bowser.png"))
 COIN = pygame.image.load(os.path.join("assets", "coin.png"))
-
+FIRE = pygame.image.load(os.path.join("assets", "fire.png"))
 
 
 #lasers
 BOMB = pygame.image.load(os.path.join("assets", "bomb.png"))
 SHELL = pygame.image.load(os.path.join("assets", "shell.png")) 
-FIRE = pygame.image.load(os.path.join("assets", "fire.png"))
 
 #BG
 BG = pygame.transform.scale(pygame.image.load(os.path.join("assets", "mario-background.png")),(WIDTH,HEIGHT)) 
 
-#Sounds
+
 music = pygame.mixer.music.load(os.path.join("assets", "mario.mp3"))
 pygame.mixer.music.play(-1)
+
 shoot = pygame.mixer.Sound("laser.ogg")
 blaster = pygame.mixer.Sound("blaster.ogg")
 explosion = pygame.mixer.Sound("bomb.mp3")
@@ -94,13 +95,14 @@ class Ship:
                 self.lasers.remove(laser)
             elif laser.collision(obj):
                 obj.health -= 10
-                
+                 
     def cooldown(self, level):
         if self.cool_down_counter >= self.COOLDOWN:
             self.cool_down_counter = 0
         elif self.cool_down_counter > 0:
             self.cool_down_counter += 1 #should get to 10 ever 1/6 seconds but its more like 2/6 seconds
 
+    
         if self.cool_down_counterp >= self.COOLDOWNP:#ready to shoot, >360 
             self.cool_down_counterp = 0
             self.enter = True
@@ -117,6 +119,7 @@ class Ship:
             SP = main_font.render(f"SHOOT", 1, (0,255,0))#ready to shoot super
             WIN.blit(SP,(5,50))
             
+       
     def shoot(self):
         if self.cool_down_counter == 0:
             pygame.mixer.Sound.play(shoot)
@@ -132,7 +135,8 @@ class Ship:
                 self.lasers.append(laser)
                 self.cool_down_counterp = 1
                 self.enter = False
-   
+
+                
     def get_width(self):
         return self.ship_img.get_width()
     
@@ -166,10 +170,14 @@ class Player(Ship): #inheriting form ship
         self.healthbar(window)
 
 
+    
     def healthbar(self, window):
         pygame.draw.rect(window, (255,0,0), (self.x, self.y + self.ship_img.get_height() + 10, self.ship_img.get_width(),10))
         pygame.draw.rect(window, (0,255,0), (self.x, self.y + self.ship_img.get_height() + 10, self.ship_img.get_width() * (self.health/self.max_health),10))
-                                      
+        
+ 
+                                
+                        
 class Enemy(Ship):
     COLOR_MAP = {
         "red": (RED_SPACE_SHIP, BOMB),
@@ -198,6 +206,8 @@ class Enemy(Ship):
                 self.lasers.append(laser)
                 self.cool_down_counter = 1
             
+            
+    
     def __init__(self, x, y, color, health=200): 
         super().__init__(x, y, health)
         self.ship_img, self.laser_img = self.COLOR_MAP[color]
@@ -212,7 +222,9 @@ class Enemy(Ship):
 
     def movel(self, vel):
         self.x -= vel
-               
+        
+
+                  
 def collide(obj1, obj2):
     offset_x = obj2.x - obj1.x
     offset_y = obj2.y - obj1.y
@@ -227,6 +239,7 @@ def collection():
         music = pygame.mixer.music.load(os.path.join("assets", "bowser.mp3"))
         pygame.mixer.music.play(-1)
 
+
         title_label = title_font.render("Bowser has entered! He disabled your shooter!", 1, (255,0,0))
 
         ten_label = title_font.render("Collect the coins to recharge your shooter!", 1, (255,255,255))
@@ -238,6 +251,7 @@ def collection():
         WIN.blit(title_label,(WIDTH/2 - title_label.get_width()/2 - 5,300))
         
         WIN.blit(c_label,(WIDTH/2 - c_label.get_width()/2 - 5,400))
+        
         
         pygame.display.update()
         for event in pygame.event.get():
@@ -285,7 +299,9 @@ def win_screen():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 run = False
                 arcade_screen()
-               
+                
+    
+
 def arcade_screen():
     title_font = pygame.font.SysFont("comicsans", 30)
     run = True
@@ -308,6 +324,7 @@ def arcade_screen():
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 run = False
+
 def lost_menu(level):
 
 
@@ -360,8 +377,8 @@ def beat_bowser():
         pygame.display.update()
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
-                run = False
-                
+                run = False 
+
 def main():
     FPS = 60 #how fast does game run
    
@@ -406,30 +423,24 @@ def main():
     last = False
     beatb = False
 
-  
-
     def redraw_window(): #draws everything for our window
         pygame.display.update() #everytime we loop, we redraw everything on the screen so that it is updated (60 times a second)
         WIN.blit(BG,(0,0))#blit takes the image and draws it in the window at given coordinates -> (0,0) is top right of the screen
         lives_label = main_font.render(f"Lives: {lives}", 1, (255,255,255)) # red,  green,  blue
         
-        
-      
         WIN.blit(lives_label,(10,10))
         
+       
         for enemy in enemies:
             enemy.draw(WIN)
 
         player.draw(WIN)
-
 
     while run:
 
         if level == 13 and beatb == False:
             beat_bowser()
             beatb = True
-
-
         if level < 21:
             WIN.blit(PEACH,(WIDTH/2 - 50,HEIGHT-100))
 
@@ -439,7 +450,7 @@ def main():
         if level == 20 and last == False:
             last = True
             win_screen()
-
+            
         if level != 10 and level != 12:
             level_label = main_font.render(f"Level:{level}", 1, (255,255,255))
             WIN.blit(level_label,(WIDTH - level_label.get_width() - 10,10))
@@ -448,22 +459,22 @@ def main():
             level_label = main_font.render(f"BOSS", 1, (128,0,0))
             WIN.blit(level_label,(WIDTH - level_label.get_width() - 10,10))
             
-            
+
         if level > 5 and (level - 5) % 3 == 0 and healb == False: #heal player every 3 rounds
             player.health = 200
             print(level)
             healb = True
             if(lives < 10):
-                lives += 1
-            
+                lives += 1    
         if(level != 12):
-            enemy_counter = main_font.render(f"Enemies:{len(enemies)}", 1, (255,255,255))
-            WIN.blit(enemy_counter,(WIDTH - level_label.get_width() - 60,50))
+            enemy_font = pygame.font.SysFont("comicsans", 30)
+            enemy_counter = enemy_font.render(f"Enemies:{len(enemies)}", 1, (255,255,255))
+            WIN.blit(enemy_counter,(WIDTH - level_label.get_width() - 35,50))
 
         if level == 12:
             enemy_counter = main_font.render(f"Enemies:{1}", 1, (255,255,255))
             WIN.blit(enemy_counter,(WIDTH - level_label.get_width() - 60,50))
-
+        
         if usedp == False and level> 12 and lost == False:
             UN = main_font.render(f"YOU UNLOCKED BLASTER", 1, (0,255,0))#ready to shoot super
             USE = main_font.render(f"PRESS P FOR BLASTER", 1, (0,255,0))#ready to shoot super
@@ -504,6 +515,7 @@ def main():
              counting = False
              shooter = True
            
+
         if (level == 12 and counting == False):
              Shoot = main_font.render(f"SHOOT!!!", 1, (0,255,0))#green
              WIN.blit(Shoot,(10,100))
@@ -522,7 +534,7 @@ def main():
 
         if len(enemies) == 0:
             if level != 10:
-                level += 1
+                level += 1   
                 healb = False
                 if(enemy_vel < 2.8):
                     enemy_vel += 0.5 #increase enemy vel up to 3.5
@@ -551,7 +563,6 @@ def main():
                 
         keys = pygame.key.get_pressed() #check 60 times every second if we are pressing a key
 
-
         if level == 10:
             if keys[pygame.K_a] and player.x - player_vel > 0: #left
                 player.x -= player_vel
@@ -576,7 +587,9 @@ def main():
             if keys[pygame.K_p]: #p
                 usedp = True
                 player.shootp()
- 
+                
+
+                
         elif level == 12:
             if keys[pygame.K_a] and player.x - player_vel > 0: #left
                 player.x -= player_vel
@@ -601,11 +614,11 @@ def main():
                 player.y += player_vel
             if keys[pygame.K_SPACE]: 
                 player.shoot()
-                      
+               
+                  
         for enemy in enemies[:]:
             if level == 10:
                 if collect == 0:
-                    
                     WIN.blit(COIN,(100,160)) #draw collectibles
                 if collect == 1:
                     WIN.blit(COIN,(100,250)) #draw collectibles
@@ -626,9 +639,11 @@ def main():
                 if collect == 9:
                     WIN.blit(COIN,(425, 700)) #draw collectibles
                
+
                 if collide(enemy, player): #player collision
                     player.health -= 159
                     enemies.remove(enemy)
+                    
 
                 if enemy.x > 560.5:
                     right = False
@@ -658,6 +673,7 @@ def main():
                 if enemy.x > 625.0:
                     rightb = False
                
+                    
                 elif enemy.x < 10:
                     rightb = True
                     
@@ -678,11 +694,15 @@ def main():
             else:
                 enemy.move(enemy_vel)
                 enemy.move_lasers(laser_vel, player, level)
+
                 if random.randrange(0, 160) == 1: #50% chance of enemy shooting every second x 60fps)
                     enemy.shoot()
+
                 if collide(enemy, player): #player collision
                     player.health -= 10
                     enemies.remove(enemy)
+
+                
                 elif enemy.y + enemy.get_height() > HEIGHT: #if enemy makes it off the screen
                     lives -= 1
                     enemies.remove(enemy)
@@ -733,17 +753,22 @@ def main():
                 collect += 1
                 pygame.mixer.Sound.play(coin)
         if counter == 9:
-            if (player.x >= 395 and player.x <= 455) and  (player.y >= 670 and player.y <= 750):
+            if (player.x >= 395 and player.x <= 455) and  (player.y >= 650 and player.y <= 750):
                 counter += 1
                 collect += 1
                 pygame.mixer.Sound.play(coin)
+
+
         player.move_lasers(-laser_vel, enemies, level)
+
         if level == 10 and counter == 10 and jesus == True:
             jesus = False
             enemies = []
-            level += 1     
+            level += 1
+        
     pygame.quit()
             
+
 def main_menu():
     title_font = pygame.font.SysFont("comicsans", 45)
     controls_font = pygame.font.SysFont("comicsans", 20)
@@ -766,15 +791,11 @@ def main_menu():
 
         WIN.blit(intro_label,(WIDTH/2 - intro_label.get_width()/2,60))
         WIN.blit(name_label,(WIDTH/2 - name_label.get_width()/2,110))
-       
-        
         WIN.blit(w_label,(WIDTH/2 - w_label.get_width()/2,200))
         WIN.blit(a_label,(WIDTH/2 - a_label.get_width()/2,250))
         WIN.blit(s_label,(WIDTH/2 - s_label.get_width()/2,300))
         WIN.blit(d_label,(WIDTH/2 - d_label.get_width()/2,350))
         WIN.blit(space_label,(WIDTH/2 - space_label.get_width()/2,400))
-
-
         WIN.blit(title_label,(WIDTH/2 - title_label.get_width()/2,450))
 
 
@@ -812,7 +833,6 @@ def controls():
         WIN.blit(title_label,(WIDTH/2 - title_label.get_width()/2 - 5,500))
         
 
-        
         pygame.display.update()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -822,16 +842,10 @@ def controls():
 
                 
     pygame.quit()
-
-
-
-
-
-
     
 
             
 main_menu()
 
 
-        
+ 
